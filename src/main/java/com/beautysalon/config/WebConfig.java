@@ -1,0 +1,14 @@
+package com.beautysalon.config;
+
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+public class WebConfig implements WebMvcConfigurer
+{
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        WebMvcConfigurer.super.addResourceHandlers(registry);
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:src/main/webapp/uploads/");
+    }
+}
