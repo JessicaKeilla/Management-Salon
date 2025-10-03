@@ -18,6 +18,14 @@ public class AgendamentoDTO
 
     @NotNull(message = "The client ID is required")
     private Long servicoId;
+//-------------------------------------------------
+    private String clienteNome;
+    private String servicoNome;
+    private String status; // Add this field
+
+    // Add getter and setter
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
 
     // Getters e Setters
@@ -33,4 +41,8 @@ public class AgendamentoDTO
     public Long getServicoId() {return servicoId;}
     public void setServicoId(Long servicoId) {this.servicoId = servicoId;}
 
+    public String getServicoNome() { return servicoNome; }
+    public void setServicoNome(String servicoNome) { this.servicoNome = servicoNome; }
+    public String getClienteNome() { return clienteNome; }
+    public void setClienteNome(String clienteNome) { this.clienteNome = clienteNome; }
 }

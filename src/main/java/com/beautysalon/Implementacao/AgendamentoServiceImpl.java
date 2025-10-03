@@ -1,14 +1,19 @@
 package com.beautysalon.Implementacao;
 
 import com.beautysalon.DTO.AgendamentoDTO;
+import com.beautysalon.DTO.ServicoDTO;
 import com.beautysalon.Inteface.AgendamentoService;
+import com.beautysalon.converter.AgendamentoConverter;
 import com.beautysalon.model.Agendamento;
+import com.beautysalon.model.Cliente;
+import com.beautysalon.model.Servico;
 import com.beautysalon.repository.AgendamentoRepository;
 import com.beautysalon.repository.ClienteRepository;
 import com.beautysalon.repository.ServicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,8 +22,7 @@ import java.util.stream.Collectors;
 
 public class AgendamentoServiceImpl  implements AgendamentoService
 {
-    //todas as anotacoe autowired esta dar erro, so na anotacao
-    @Autowired
+     @Autowired
     private AgendamentoRepository agendamentoRepository;
 
     @Autowired
@@ -27,38 +31,72 @@ public class AgendamentoServiceImpl  implements AgendamentoService
     @Autowired
     private ServicoRepository servicoRepository;
 
+    //converter
+    @Autowired
+    private AgendamentoConverter agendamentoConverter;
+
+
     @Override
     public List<AgendamentoDTO> listarTodos() {
         return agendamentoRepository.findAll()
                 .stream()
-                .map(this::toDTO)
+                .map(agendamentoConverter::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public AgendamentoDTO buscarPorId(Long id) {
         return agendamentoRepository.findById(id)
-                .map(this::toDTO)
-                .orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
+                .map(agendamentoConverter::toDTO)
+                .orElseThrow(() -> new RuntimeException("Agenda not found"));
 
     }
 
     @Override
     public AgendamentoDTO salvar(AgendamentoDTO dto) {
-        Agendamento agendamento = toEntity(dto);
-        return toDTO(agendamentoRepository.save(agendamento));
+        Agendamento agendamento = agendamentoConverter.toEntity(dto);
+        agendamento.setDataHora(dto.getDataHora());
 
+        Cliente cliente = clienteRepository.findById(dto.getClienteId())
+                .orElseThrow(() -> new RuntimeException("Client not found"));
+        agendamento.setCliente(cliente);
+
+        Servico servico = servicoRepository.findById(dto.getServicoId())
+                .orElseThrow(() -> new RuntimeException("Service not found"));
+        agendamento.getServicos().add(servico);
+        if (agendamento.getServicos()==null)
+        {
+            agendamento.setServicos(new ArrayList<>());
+        }
+
+        Agendamento saved = agendamentoRepository.save(agendamento);
+        agendamentoRepository.flush();
+        return agendamentoConverter.toDTO(saved);
     }
 
     @Override
     public AgendamentoDTO atualizar(Long id, AgendamentoDTO dto) {
-//        Agendamento existente = agendamentoRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
-//        existente.setDataHora(dto.getDataHora());
-//        existente.setCliente(clienteRepository.findById(dto.getClienteId()).orElse(null)); //setCliente nao funciona
-//       // existente.setServico(servicoRepository.findById(dto.getServicoId()).orElse(null));//setServico tambem , e o restate dos
-//        return toDTO(agendamentoRepository.save(existente));
-        return null;
+    Agendamento existente = agendamentoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Agenda not found"));
+
+
+
+        existente.setDataHora(dto.getDataHora());
+
+        Cliente cliente = clienteRepository.findById(dto.getClienteId())
+                .orElseThrow(() -> new RuntimeException("Client not found"));
+        existente.setCliente(cliente);
+
+        existente.getServicos().clear();
+        Servico servico = servicoRepository.findById(dto.getServicoId())
+                .orElseThrow(() -> new RuntimeException("Service not found"));
+        existente.getServicos().add(servico);
+
+        //converter
+        Agendamento atualizado= agendamentoConverter.toEntity(dto);
+        atualizado.setId(existente.getId());
+
+        return agendamentoConverter.toDTO(agendamentoRepository.save(atualizado));
     }
 
     @Override
@@ -66,20 +104,54 @@ public class AgendamentoServiceImpl  implements AgendamentoService
         agendamentoRepository.deleteById(id);
 
     }
+
+
+
     private AgendamentoDTO toDTO(Agendamento a) {
         AgendamentoDTO dto = new AgendamentoDTO();
-//        dto.setId(a.getId());
-//        dto.setDataHora(a.getDataHora());
-//        dto.setClienteId(a.getCliente().getId());
-//        //dto.setServicoId(a.getServico().getId());
+        dto.setId(a.getId());
+        dto.setDataHora(a.getDataHora());
+        dto.setClienteId(a.getCliente().getId());
+        dto.setClienteNome(a.getCliente().getNome());
+
+
+        if (!a.getServicos().isEmpty()) {
+
+            dto.setServicoId(a.getServicos().get(0).getId());
+            dto.setServicoNome(a.getServicos().get(0).getNome());
+//            dto.setServicoNome(dto.getServicoNome());
+//            dto.setStatus(a.getStatus());
+        }
+        if (a.getCliente() != null) {
+            dto.setClienteId(a.getCliente().getId());
+            dto.setClienteNome(a.getCliente().getNome());
+        }
+
         return dto;
     }
 
     private Agendamento toEntity(AgendamentoDTO dto) {
         Agendamento agendamento = new Agendamento();
-//        agendamento.setDataHora(dto.getDataHora());
-//        agendamento.setCliente(clienteRepository.findById(dto.getClienteId()).orElse(null));
-//      //  agendamento.setServico(servicoRepository.findById(dto.getServicoId()).orElse(null));
+        agendamento.setDataHora(dto.getDataHora());
+
+        Cliente cliente = clienteRepository.findById(dto.getClienteId())
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        agendamento.setCliente(cliente);
+
+        Servico servico = servicoRepository.findById(dto.getServicoId())
+                .orElseThrow(() -> new RuntimeException("Serviço não encontrado"));
+        agendamento.getServicos().add(servico);
+
         return agendamento;
     }
+
+    //query servicolstar
+    public List<Agendamento> listarPorServico(Long servicoId) {
+        return agendamentoRepository.findByServicoId(servicoId);
+    }
+//    @Override
+//    public List<AgendamentoDTO> listarPorServico(ServicoDTO servico) {
+//        return List.of();
+//    }
+
 }

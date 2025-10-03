@@ -1,8 +1,10 @@
 package com.beautysalon.model;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.util.List;
-import lombok.*;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -43,4 +45,8 @@ public class Cliente {
     public List<Agendamento> getAgendamentos() {return agendamentos;}
     public void setAgendamentos(List<Agendamento> agendamentos) {this.agendamentos = agendamentos;}
 
+    public LocalDate getDataNascimento() {
+
+        return null;
+    }
 }

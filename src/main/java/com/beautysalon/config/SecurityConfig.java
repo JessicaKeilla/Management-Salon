@@ -6,8 +6,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,21 +36,45 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/register", "/usuarios/novo").permitAll()
-                        .requestMatchers("/roles/**", "/usuarios/**").hasRole("ADMIN")
+                .authorizeHttpRequests(auth -> auth //"/home/login"
+                        .requestMatchers( "/","home/", "/login", "/register"
+                                , "/css/**","/api/**",
+                                "/uploads/**","/js/**", "/images/**" ,"/favicon.ico"
+                                 , "/roles/**", "/usuarios/**").permitAll()
+                        .requestMatchers("/usuarios/**").authenticated()
+                        .requestMatchers("/clientes/**").authenticated()
+                        .requestMatchers("/agendamentos/**").authenticated()
+                        .requestMatchers("/servicos/**").authenticated()
+
+                        .requestMatchers("/roles/**").hasRole("ADMIN") // era so admin
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/clientes", true)
+                        .defaultSuccessUrl("/home") //true removed, antes era /client
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
+                ).csrf(csrf-> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .ignoringRequestMatchers("/api**"))
+                .headers(headers-> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 );
+
+                //.csrf(csrf -> csrf.disable());// Desabilite CSRF temporariamente para testes
+
         return http.build();
+    }
+
+
+
+
+
+    //@Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().requestMatchers("/css/**", "/js/**", "/images/**", "/uploads/**", "/favicon.ico");
     }
 }

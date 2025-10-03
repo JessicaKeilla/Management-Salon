@@ -6,11 +6,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Setter
 @Getter
+
 
 public class Agendamento {
     @Id
@@ -29,7 +31,7 @@ public class Agendamento {
             joinColumns = @JoinColumn(name = "agendamento_id"),
             inverseJoinColumns = @JoinColumn(name = "servico_id")
     )
-    private List<Servico> servicos;
+    private List<Servico> servicos= new ArrayList<>();
 
 
     public void setServico(Servico servico) {
@@ -72,6 +74,10 @@ public class Agendamento {
     public void setServicos(List<Servico> servicos) {
         this.servicos = servicos;
     }
+
+//    public String getStatus() {
+//        return getStatus();
+//    }
 }
 
 

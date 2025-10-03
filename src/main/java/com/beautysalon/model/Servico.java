@@ -1,5 +1,6 @@
 package com.beautysalon.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,6 +28,7 @@ public class Servico {
 
 
     @ManyToMany(mappedBy = "servicos")
+    @JsonIgnore
     private List<Agendamento> agendamentos;
 
     // Getters e Setters

@@ -22,11 +22,13 @@ public class UserDTO {
     @Size(min = 6, message = "At least 6 characters")
     private String password;
 
-    @NotEmpty(message = "At least one role must be assigned")
+    //@NotEmpty(message = "At least one role must be assigned")
     private Set<Long> roleIds;
 
     private MultipartFile imagem;
     private String imagemUrl;
+
+    private Set<RoleDTO> roles;
 
 
     // Getters e Setters
@@ -70,5 +72,13 @@ public class UserDTO {
 
     public String getImagemUrl() {return imagemUrl;}
     public void setImagemUrl(String imagemUrl) {this.imagemUrl = imagemUrl;}
+
+    public Set<RoleDTO> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<RoleDTO> roles) {
+        this.roles = roles;
+    }
 
 }

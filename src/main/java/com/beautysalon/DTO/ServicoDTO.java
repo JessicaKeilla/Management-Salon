@@ -3,6 +3,7 @@ package com.beautysalon.DTO;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 
@@ -21,6 +22,9 @@ public class ServicoDTO
     private BigDecimal preco;
 
     private String imagem;
+
+    private transient MultipartFile imagemFile;
+
 
 
     // Getters e Setters
@@ -62,6 +66,10 @@ public class ServicoDTO
     public void setImagem(String imagem) {
         this.imagem = imagem;
     }
+
+
+    public MultipartFile getImagemFile() {return imagemFile;}
+    public void setImagemFile(MultipartFile imagemFile) {this.imagemFile = imagemFile;}
 
 }
 

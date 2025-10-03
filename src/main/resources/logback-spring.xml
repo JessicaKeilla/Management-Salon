@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
+<!--    define para onde os logs vão (console, arquivo)-->
     <!-- Appender para console -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -69,10 +70,11 @@
         <appender-ref ref="FILE_USUARIO"/>
     </logger>
 
-    <!-- Root logger -->
+    <!-- Root logger  “global” da aplicação (pega tudo que não foi tratado por loggers específicos).-->
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE_GENERAL" />
     </root>
+
 
 </configuration>

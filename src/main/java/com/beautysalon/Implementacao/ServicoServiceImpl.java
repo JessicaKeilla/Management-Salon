@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 @Service
 public class ServicoServiceImpl implements ServicoService {
 
+
     @Autowired
     private ServicoRepository servicoRepository;
 
@@ -19,9 +20,12 @@ public class ServicoServiceImpl implements ServicoService {
     public ServicoDTO salvar(ServicoDTO dto)
     {
         Servico servico = new Servico();
+
+
         servico.setNome(dto.getNome());
         servico.setDescricao(dto.getDescricao());
         servico.setPreco(dto.getPreco());
+        servico.setImagem(dto.getImagem());
 
         Servico salvo = servicoRepository.save(servico);
 
@@ -38,6 +42,7 @@ public class ServicoServiceImpl implements ServicoService {
             dto.setNome(s.getNome());
             dto.setDescricao(s.getDescricao());
             dto.setPreco(s.getPreco());
+            dto.setImagem(s.getImagem());
             return dto;
         }).collect(Collectors.toList());
     }

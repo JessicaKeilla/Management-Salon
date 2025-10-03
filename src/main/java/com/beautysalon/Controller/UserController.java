@@ -11,10 +11,16 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/usuarios")
 public class UserController {
+
+//    @GetMapping
+//    public String redirect() {
+//        return "redirect:/usuarios";
+//    }
 
     @Autowired
     private UserService userService;
@@ -22,16 +28,28 @@ public class UserController {
     @Autowired
     private RoleService roleService;
 
+
+
+
     @GetMapping
-    public String listar(Model model) {
-        model.addAttribute("usuarios", userService.listarTodos());
-        return "user/list";
+    public String listar(Model model, Principal principal) {
+        try {
+            System.out.println("Acess to user list" + principal.getName());
+            model.addAttribute("usuarios", userService.listarTodos());
+            model.addAttribute("pageTitle", "Lista de Usuários");
+            return "usuario/list";
+        } catch (Exception e) {
+            model.addAttribute("error", "Erro ao carregar usuários: " + e.getMessage());
+            return "error";
+        }
     }
 
     @GetMapping("/{id}")
     public String detalhe(@PathVariable Long id, Model model) {
         model.addAttribute("usuario", userService.buscarPorId(id));
-        return "user/list";
+        model.addAttribute("roles", roleService.listarTodos());
+        model.addAttribute("pageTitle", "Editar Usuário");
+        return "usuario/form";
     }
 
     @PostMapping
@@ -61,4 +79,36 @@ public class UserController {
         userService.deletar(id);
         return "redirect:/usuarios";
     }
+    @PostMapping("/register")
+    public String registerUser(@ModelAttribute("userDTO") UserDTO userDTO,
+                               BindingResult result,
+                               Model model) throws IOException {
+
+        // Verifica se username já existe
+        if(userService.userExists(userDTO.getUsername())) {
+            result.rejectValue("username", "error.userDTO", "Nome de usuário já existe");
+        }
+
+        if (result.hasErrors()) {
+            model.addAttribute("contentPage", "auth/registerContent");
+            return "home/index";
+        }
+
+        userService.registerNewUser(userDTO);
+        return "redirect:/login?registered";
+    }
+    @GetMapping("/novo")
+    public String novoForm(Model model) {
+        model.addAttribute("usuario", new UserDTO());
+        model.addAttribute("roles", roleService.listarTodos());
+        model.addAttribute("pageTitle", "Novo Usuário");
+        return "usuario/form";
+    }
+
+
+//    @GetMapping("/{id}")
+//    public String detalhes(@PathVariable Long id, Model model) {
+//        model.addAttribute("user", userService.buscarPorId(id));
+//        return "user/detail";
+//    }
 }

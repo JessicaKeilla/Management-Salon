@@ -17,6 +17,7 @@ public class ClienteRestController {
 
     @GetMapping
     public ResponseEntity<List<ClienteDTO>> listarTodos() {
+        System.out.println("✅ ClienteRestController: método listarTodos() chamado!");
         return ResponseEntity.ok(clienteService.listarTodos());
     }
 

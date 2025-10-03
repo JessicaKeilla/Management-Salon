@@ -1,5 +1,6 @@
 package com.beautysalon.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,7 +8,7 @@ import java.util.Set;
 
 @Entity
 @Data
-@NoArgsConstructor
+//@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Role
@@ -17,10 +18,16 @@ public class Role
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)  // Garante que nomes de roles sejam únicos
     private String nome;
 
     @ManyToMany(mappedBy = "roles")
+    @JsonIgnore
     private Set<User> users;
+
+    public Role(String nome) {
+        this.nome = nome;
+    }
 
     public String getNome() {return nome;}
     public void setNome(String nome) {this.nome = nome;}
@@ -30,5 +37,10 @@ public class Role
 
     public Set<User> getUsers() {return users;}
     public void setUsers(Set<User> users) {this.users = users;}
+    public Role() {}
 
+//    public Role orElseThrow(Object roleAdminNãoEncontrada)
+//    {
+//        return null;
+//    }
 }
